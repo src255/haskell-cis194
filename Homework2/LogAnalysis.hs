@@ -2,16 +2,16 @@
 
 module LogAnalysis where
 
-import Log
-import Text.ParserCombinators.Parsec as P
+import           Log
+import           Text.ParserCombinators.Parsec as P
 
 messageParser :: GenParser Char st LogMessage
 messageParser =
   do
     a <- oneOf "IW"
-    _ <- space
+    space
     time <- read <$> many1 digit
-    _ <- space
+    space
     msg <- manyTill anyChar eof
     return
       ( case a of
@@ -19,12 +19,12 @@ messageParser =
           'W' -> LogMessage Warning time msg
       )
     <|> do
-      _ <- char 'E'
-      _ <- space
+      char 'E'
+      space
       err <- read <$> many1 digit
-      _ <- space
+      space
       time <- read <$> many1 digit
-      _ <- space
+      space
       msg <- manyTill anyChar eof
       return (LogMessage (Error err) time msg)
     <|> do
@@ -35,7 +35,7 @@ parseMessage :: String -> LogMessage
 parseMessage s =
   case P.parse messageParser "Error" s of
     Right msg -> msg
-    Left _ -> Unknown ""
+    Left _    -> Unknown ""
 
 parse :: String -> [LogMessage]
 parse = map parseMessage . lines
@@ -57,7 +57,7 @@ build :: [LogMessage] -> MessageTree
 build = foldr insert Leaf
 
 inOrder :: MessageTree -> [LogMessage]
-inOrder Leaf = []
+inOrder Leaf                   = []
 inOrder (Node left root right) = inOrder left ++ [root] ++ inOrder right
 
 whatWentWrong :: [LogMessage] -> [String]
@@ -65,7 +65,7 @@ whatWentWrong messages = map getMessage sortedErrorMessages
   where
     getMessage :: LogMessage -> String
     getMessage (LogMessage _ _ message) = message
-    getMessage (Unknown _) = ""
+    getMessage (Unknown _)              = ""
 
     sortedErrorMessages = inOrder $ build $ filter isSevere messages
       where
