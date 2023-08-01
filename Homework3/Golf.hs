@@ -23,17 +23,19 @@ histogram :: [Integer] -> String
 histogram xs = bars <> bottom
   where
     bars :: String
-    bars = unlines $ map drawRow [height,height - 1 .. 1]
+    bars = unlines rows
+    rows :: [String]
+    rows = map drawRow [height,height - 1 .. 1]
     drawRow :: Int -> String
-    drawRow row = map (draw row) counts
-    draw :: Int -> Int -> Char
-    draw row freq
+    drawRow row = map (drawAt row) freqs
+    drawAt :: Int -> Int -> Char
+    drawAt row freq
         | freq >= row = '*'
         | otherwise = ' '
     height :: Int
-    height = maximum $ map count [0 .. 9]
-    counts :: [Int]
-    counts = map count [0 .. 9]
+    height = maximum freqs
+    freqs :: [Int]
+    freqs = map count [0 .. 9]
     count :: Integer -> Int
     count n = length $ filter (== n) xs
     bottom = "==========\n0123456789\n"
