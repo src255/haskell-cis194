@@ -31,9 +31,12 @@ streamRepeat x = s
   where
     s = Stream x s
 
-streamMap :: (a -> b) -> Stream a -> Stream b
-streamMap f (Stream a s) = Stream (f a) (streamMap f s)
+instance Functor Stream where
+    fmap :: (a -> b) -> Stream a -> Stream b
+    fmap f (Stream x xs) = Stream (f x) (fmap f xs)
 
+-- streamMap :: (a -> b) -> Stream a -> Stream b
+-- streamMap f (Stream a s) = Stream (f a) (streamMap f s)
 streamZip :: Stream a -> Stream b -> Stream (a, b)
 streamZip (Stream x xs) (Stream y ys) = Stream (x, y) (streamZip xs ys)
 
@@ -43,7 +46,7 @@ streamZipWith f (Stream x xs) (Stream y ys) = Stream (f x y) (streamZipWith f xs
 streamFromSeed :: (a -> a) -> a -> Stream a
 streamFromSeed f x = Stream x tail
   where
-    tail = Stream (f x) (streamMap f tail)
+    tail = Stream (f x) (fmap f tail)
 
 interleaveStreams :: Stream a -> Stream a -> Stream a
 interleaveStreams = left
@@ -60,7 +63,7 @@ largestPowOf2 n
     | otherwise = 1 + largestPowOf2 (n `div` 2)
 
 ruler :: Stream Integer
-ruler = streamMap largestPowOf2 $ streamFromSeed (+ 1) 1
+ruler = largestPowOf2 <$> streamFromSeed (+ 1) 1
 
 ruler' :: Stream Integer
 ruler' = weave 0
@@ -74,15 +77,15 @@ instance Num (Stream Integer) where
     fromInteger :: Integer -> Stream Integer
     fromInteger n = Stream n (streamRepeat 0)
     negate :: Stream Integer -> Stream Integer
-    negate = streamMap negate
+    negate = fmap negate
     (+) :: Stream Integer -> Stream Integer -> Stream Integer
     (+) = streamZipWith (+)
     (*) :: Stream Integer -> Stream Integer -> Stream Integer
-    (Stream x xs) * b@(Stream y ys) = Stream (x * y) (streamMap (* x) ys + xs * b)
+    (Stream x xs) * b@(Stream y ys) = Stream (x * y) (fmap (* x) ys + xs * b)
 
 instance Fractional (Stream Integer) where
     (/) :: Stream Integer -> Stream Integer -> Stream Integer
-    a@(Stream x xs) / b@(Stream y ys) = Stream (x `div` y) (streamMap (`div` y) (xs - ys * (a / b)))
+    a@(Stream x xs) / b@(Stream y ys) = Stream (x `div` y) (fmap (`div` y) (xs - ys * (a / b)))
 
 fibs3 :: Stream Integer
 fibs3 = x / (1 - x - x ^ 2)
