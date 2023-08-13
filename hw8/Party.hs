@@ -1,10 +1,14 @@
 module Party where
 
-import           Data.Foldable (foldr')
-import           Data.List     (maximumBy)
-import           Data.Ord      (comparing)
-import           Data.Tree     (Tree (..))
-import           Employee      (Employee (empFun), Fun, GuestList (..))
+import           Data.Foldable            (foldr')
+import           Data.List                (maximumBy, sort)
+import           Data.Ord                 (comparing)
+import           Data.Tree                (Tree (..))
+import           Distribution.Simple.Test (test)
+import           Employee                 (Employee (empFun, empName), Fun,
+                                           GuestList (..), testCompany,
+                                           testCompany2)
+import           Text.Printf              (printf)
 
 glCons :: Employee -> GuestList -> GuestList
 glCons e g@(GL es fun)
@@ -45,7 +49,11 @@ nextLevel b xs = (withBoss, withoutBoss)
 maxFun :: Tree Employee -> GuestList
 maxFun = uncurry moreFun . treeFold nextLevel
 
+guests :: GuestList -> String
+guests (GL es f) = printf "Fun: %d\n" f <> unlines (sort $ map empName es)
+
 main :: IO ()
 main = do
     company <- readFile "company.txt"
-    print $ maxFun (read company)
+    -- let company = testCompany
+    putStrLn $ guests $ maxFun $ read company
