@@ -39,7 +39,7 @@ nextLevel b xs = (withBoss, withoutBoss)
   where
     withBoss = maximumBy (comparing fun) (flattenWith awkward ok xs)
     withoutBoss = maximumBy (comparing fun) (flattenWith id id xs)
-    awkward (GL (e:es) f) = GL (b : es) (f - empFun e)
+    awkward (GL (e:es) f) = GL (b : e : es) (f - empFun e)
     ok = glCons b
 
 maxFun :: Tree Employee -> GuestList
