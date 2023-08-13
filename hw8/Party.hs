@@ -16,7 +16,7 @@ glCons e g@(GL es fun)
 
 instance Semigroup GuestList where
     (<>) :: GuestList -> GuestList -> GuestList
-    g <> (GL es _) = foldr glCons g es
+    (GL es _) <> g = foldr glCons g es
 
 instance Monoid GuestList where
     mempty :: GuestList
