@@ -87,7 +87,7 @@ instance Buffer (JoinList (Score, Size) String) where
     toString (Single _ s)   = s
     toString (Append _ l r) = toString l <> toString r
     fromString :: String -> JoinList (Score, Size) String
-    fromString = mconcat . map (\s -> Single (scoreString s, Size 1) s) . lines
+    fromString = foldMap (\s -> Single (scoreString s, Size 1) s) . lines
     line :: Int -> JoinList (Score, Size) String -> Maybe String
     line = indexJ
     replaceLine :: Int -> String -> JoinList (Score, Size) String -> JoinList (Score, Size) String

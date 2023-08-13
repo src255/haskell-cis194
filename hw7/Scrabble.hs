@@ -34,4 +34,4 @@ score c =
     c' = toLower c
 
 scoreString :: String -> Score
-scoreString = mconcat . map score
+scoreString = foldMap score
