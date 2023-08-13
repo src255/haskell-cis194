@@ -1,6 +1,5 @@
 module Party where
 
-import           Data.Foldable            (foldr')
 import           Data.List                (maximumBy, sort)
 import           Data.Ord                 (comparing)
 import           Data.Tree                (Tree (..))
@@ -17,7 +16,7 @@ glCons e g@(GL es fun)
 
 instance Semigroup GuestList where
     (<>) :: GuestList -> GuestList -> GuestList
-    g <> (GL es _) = foldr' glCons g es
+    g <> (GL es _) = foldr glCons g es
 
 instance Monoid GuestList where
     mempty :: GuestList
