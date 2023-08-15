@@ -12,9 +12,9 @@ newtype Parser a = P
 
 instance Functor Parser where
     fmap :: (a -> b) -> Parser a -> Parser b
-    fmap f p =
+    fmap f (P p) =
         P $ \input ->
-            case parse p input of
+            case p input of
                 Nothing     -> Nothing
                 Just (x, s) -> Just (f x, s)
 
@@ -30,9 +30,9 @@ instance Applicative Parser where
 
 instance Monad Parser where
     (>>=) :: Parser a -> (a -> Parser b) -> Parser b
-    pa >>= f =
+    (P p) >>= f =
         P $ \input ->
-            case parse pa input of
+            case p input of
                 Nothing     -> Nothing
                 Just (x, s) -> parse (f x) s
 
@@ -40,10 +40,10 @@ instance Alternative Parser where
     empty :: Parser a
     empty = P $ const Nothing
     (<|>) :: Parser a -> Parser a -> Parser a
-    p <|> p' =
+    (P p) <|> (P p') =
         P $ \input ->
-            case parse p input of
-                Nothing     -> parse p' input
+            case p input of
+                Nothing     -> p' input
                 Just (x, s) -> Just (x, s)
 
 item :: Parser Char
@@ -79,7 +79,7 @@ abParser_ :: Parser ()
 abParser_ = void abParser
 
 intPair :: Parser (Integer, Integer)
-intPair = (\a _ b -> (a, b)) <$> posInt <*> satisfy isSpace <*> posInt
+intPair = (,) <$> posInt <* satisfy isSpace <*> posInt
 
 intOrUpper :: Parser ()
 intOrUpper = void posInt <|> void (satisfy isUpper)
