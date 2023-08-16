@@ -74,10 +74,11 @@ invade b@(Battlefield a d)
         b' <- battle b
         invade b'
 
+victory :: Battlefield -> Bool
+victory b = defenders b == 0
+
 successProb :: Battlefield -> Rand StdGen Double
 successProb b = do
     results <- replicateM 1000 (invade b)
     let victories = length $ filter victory results
     return $ fromIntegral victories / 1000
-  where
-    victory (Battlefield _ d) = d == 0
