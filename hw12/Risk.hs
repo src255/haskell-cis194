@@ -49,8 +49,8 @@ faceOff ::
        [DieValue] -- ^ Attacker rolls
     -> [DieValue] -- ^ Defender rolls
     -> (Army, Army) -- ^ (Attackers lost, Defenders lost)
-faceOff [] ys = (0, length ys)
-faceOff xs [] = (length xs, 0)
+faceOff xs ys
+    | null xs || null ys = (0, 0)
 faceOff (x:xs) (y:ys) =
     let start =
             if unDV x > unDV y
